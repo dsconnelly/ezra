@@ -52,3 +52,14 @@ class WeekTime(object):
         if m < 0 or m > 59:
             raise ValueError('Minute value must be in [0..59]; got ' + str(m))
         self._minute = m
+
+    # Here are some useful methods.
+
+    def __repr__(self):
+        return 'WeekTime(day=%s, hour=%s, minute=%s)' % (
+            self.day, self.hour, self.minute)
+
+    def __eq__(self, other):
+        return (self.day == other.day
+            and self.hour == other.hour
+            and self.minute == other.minute)
