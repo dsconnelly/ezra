@@ -40,6 +40,18 @@ class Course(object):
         self._required = required
 
         self._meeting_groups = meeting_groups
+        for mg in self.meeting_groups:
+            mg.course = self
+
+        # We set a default activation.
+        for kind in self.required:
+            found = False
+            for mg in self.meeting_groups:
+                if mg.kind == kind:
+                    mg.active = True
+                    found = True
+            if found:
+                continue
 
     @property
     def department(self):
@@ -76,19 +88,33 @@ class Course(object):
             and self.number == other.number
             and self.title == other.title)
 
+    def all_active_meetings(self):
+        """Returns a list of all meetings associated with this course that
+        belong to an active MeetingGroup."""
+        output = []
+        for mg in self.meeting_groups:
+            if mg.active:
+                for m in mg.meetings:
+                    output.append(m)
+        return output
+
 class MeetingGroup(object):
     """A MeetingGroup refers to a lecture or discussion or so on, which may
     meet several times throughout the week."""
     allowed_kinds = ['LEC', 'DIS', 'LAB', 'TA', 'SEM']
     allowed_days = 'MTWRF'
 
-    def __init__(self, kind, instructor, days, start, end):
+    def __init__(self, kind, instructor, days, start, end, course,
+        active=False):
         """Initializes the Meeting. The parameters are:
             kind : a string like 'LEC' or 'DIS'.
             instructor : a string, the name of the instructor.
             days : a string like 'MWF'.
             start : a WeekTime object holding the start time.
             end : a WeekTime object holding the end time.
+            active : a boolean value indicating whether the MeetingGroup has
+                been selected to be enrolled in.
+            course : the course to which this MeetingGroup belongs.
         Though it does not, strictly speaking, matter, the start and end
         WeekTimes should have day values of None, for good practice."""
         if kind not in self.allowed_kinds:
@@ -109,15 +135,18 @@ class MeetingGroup(object):
                 raise ValueError('Unknown day code: %s' % d)
             m_start = wt.WeekTime(d_idx, start.hour, start.minute)
             m_end = wt.WeekTime(d_idx, end.hour, end.minute)
-            self.meetings.append(Meeting(m_start, m_end))
+            self.meetings.append(Meeting(m_start, m_end, self))
+        self.active = active
 
 class Meeting(object):
     """A Meeting refers to a single event during the week."""
-    def __init__(self, start, end):
+    def __init__(self, start, end, mg):
         """Since for now only MeetingGroup will call this, we will assume
-        that the start and end times are acceptable."""
+        that the start and end times are acceptable. Parameter mg is a
+        MeetingGroup object to which this meeting belongs."""
         self.start = start
         self.end = end
+        self.meeting_group = mg
 
     def overlap(self, other):
         """Determines if two Meeting objects overlap in time."""
@@ -125,3 +154,12 @@ class Meeting(object):
         if self.start < other.start:
             return other.start < self.end
         return self.start < other.end
+
+    def __lt__(self, other):
+        """We define an order on Meeting objects based on start times.
+        In practice, this should only be called on Meeting objects known not to
+        overlap that occur on the same day."""
+        return self.start < other.start
+
+    def __le__(self, other):
+        return self.start <= other.start

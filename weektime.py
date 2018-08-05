@@ -58,6 +58,17 @@ class WeekTime(object):
             raise ValueError('Minute value must be in [0..59]; got ' + str(m))
         self._minute = m
 
+
+    def as_tod_string(self):
+        """Returns a string of the form '08:00', neglecting the day."""
+        hour = str(self.hour)
+        if len(hour) == 1:
+            hour = '0' + hour
+        minute = str(self.minute)
+        if len(minute) == 1:
+            minute = '0' + minute
+        return '%s:%s' % (hour, minute)
+
     # Here are some useful methods.
 
     def __repr__(self):

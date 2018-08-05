@@ -14,7 +14,7 @@ class Query(object):
     specific roster to each Query instance."""
     base_url = 'https://classes.cornell.edu/api/2.0/'
 
-    def __init__(self, roster='SP18'):
+    def __init__(self, roster='FA18'):
         """Pulls the list of of department long names, useful later."""
         self.roster = roster
 
@@ -65,7 +65,7 @@ class Query(object):
                     except ValueError:
                         continue
                     mg_instance = courses.MeetingGroup(kind, instructor, days,
-                        start, end)
+                        start, end, course=None)
                     meeting_groups.append(mg_instance)
         if meeting_groups != []:
             return courses.Course(department, dept_short, number, title,
@@ -106,7 +106,3 @@ class Query(object):
                 return c
         raise ClassNotFoundError('Could not find ' + dept_short + ' '
             + str(number))
-
-if __name__ == '__main__':
-    q = Query()
-    print(q.get_courses_by_dept('MATH'))
