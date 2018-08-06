@@ -58,7 +58,7 @@ class Query(object):
                     for i in mg['instructors']:
                         instructor.append(i['firstName'] + i['lastName'])
                     instructor = ', '.join(instructor)
-                    days = mg['pattern']
+                    days = self.parse_day_string(mg['pattern'])
                     try:
                         start = wt.parse_time(mg['timeStart'])
                         end = wt.parse_time(mg['timeEnd'])
@@ -71,6 +71,17 @@ class Query(object):
             return courses.Course(department, dept_short, number, title,
                 required, meeting_groups)
         return None
+
+    def parse_day_string(self, s):
+        """Given a string like 'MWF', returns an array of the day codes. Needed
+        because the Sunday code is 'Su'."""
+        output = []
+        for c in s:
+            if c == 'u':
+                output[-1] += 'u'
+            else:
+                output.append(c)
+        return output
 
     def get_courses_by_dept(self, dept_short):
         """Given a department abbreviation (like 'EAS'), return a list of Course

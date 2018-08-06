@@ -81,8 +81,8 @@ class Course(object):
 class MeetingGroup(object):
     """A MeetingGroup refers to a lecture or discussion or so on, which may
     meet several times throughout the week."""
-    allowed_kinds = ['LEC', 'DIS', 'LAB', 'TA', 'SEM']
-    allowed_days = 'MTWRF'
+    allowed_kinds = ['LEC', 'DIS', 'LAB', 'TA', 'SEM', 'STU']
+    allowed_days = ['M', 'T', 'W', 'R', 'F', 'S', 'Su']
 
     def __init__(self, kind, instructor, days, start, end, course):
         """Initializes the Meeting. The parameters are:
@@ -111,7 +111,7 @@ class MeetingGroup(object):
         self.meetings = []
         for d in self.days:
             try:
-                d_idx = self.allowed_days.find(d) + 1
+                d_idx = self.allowed_days.index(d) + 1
             except ValueError:
                 raise ValueError('Unknown day code: %s' % d)
             m_start = wt.WeekTime(d_idx, start.hour, start.minute)
@@ -120,7 +120,7 @@ class MeetingGroup(object):
 
     def dropdown_format(self):
         """Returns a string useful for display in web dropdown menus."""
-        return (self.days + ' ' + self.start.as_tod_string() + ' - '
+        return (''.join(self.days) + ' ' + self.start.as_tod_string() + ' - '
             + self.end.as_tod_string())
 
 class Meeting(object):
