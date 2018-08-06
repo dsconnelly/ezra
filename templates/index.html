@@ -8,7 +8,7 @@
     </head>
 
     <body>
-        <h1>welcome to ezra, the ez roster assistant.</h1>
+        <h1>welcome to <a href="https://en.wikipedia.org/wiki/Ezra_Cornell">ezra</a>, the ez roster assistant.</h1>
         <p>
             ezra is a scheduling app that knows about degree requirements. get
             started by adding some courses on the right.
@@ -22,38 +22,37 @@
                 <th class="dayHeaderCell">wednesday</th>
                 <th class="dayHeaderCell">thursday</th>
                 <th class="dayHeaderCell">friday</th>
+            </tr>
+
+            {% for i in range(8, 17) %}
+            <tr>
+                <td rowspan="2" class="timeCell">{{i|string + ':00'}}</td>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+            </tr>
+            <tr>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+                <td class="hhblock"></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <table id="classInfoTable">
+            <tr>
                 <th>class info</th>
             </tr>
 
-            {% for i in range(18) %}
-
-            {% if i % 2 == 0 %}
-            {% set h = ((i / 2) + 8)|int %}
+            {% for i in range(0, 6) %}
             <tr>
-                <td rowspan="2">{{h|string + ':00'}}</td>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                {% if i % 3 == 0 %}
-                <td rowspan=3 class="classInfoCell" contenteditable>click to add a class</td>
-                {% endif %}
+                <td class="classInfoCell">click to add a class</td>
             </tr>
-            {% else %}
-            <tr>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                <td class="hhblock"></td>
-                {% if i % 3 == 0 %}
-                <td rowspan=3 class="classInfoCell" contenteditable>click to add a class</td>
-                {% endif %}
-            </tr>
-            {% endif %}
             {% endfor %}
-
         </table>
 
     </body>

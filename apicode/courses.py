@@ -37,21 +37,11 @@ class Course(object):
 
         if type(required) is not set:
             raise ValueError('Course requirements must be a set')
-        self._required = required
+        self._required = list(required)
 
         self._meeting_groups = meeting_groups
         for mg in self.meeting_groups:
             mg.course = self
-
-        # We set a default activation.
-        for kind in self.required:
-            found = False
-            for mg in self.meeting_groups:
-                if mg.kind == kind:
-                    mg.active = True
-                    found = True
-            if found:
-                continue
 
     @property
     def department(self):
@@ -88,32 +78,19 @@ class Course(object):
             and self.number == other.number
             and self.title == other.title)
 
-    def all_active_meetings(self):
-        """Returns a list of all meetings associated with this course that
-        belong to an active MeetingGroup."""
-        output = []
-        for mg in self.meeting_groups:
-            if mg.active:
-                for m in mg.meetings:
-                    output.append(m)
-        return output
-
 class MeetingGroup(object):
     """A MeetingGroup refers to a lecture or discussion or so on, which may
     meet several times throughout the week."""
     allowed_kinds = ['LEC', 'DIS', 'LAB', 'TA', 'SEM']
     allowed_days = 'MTWRF'
 
-    def __init__(self, kind, instructor, days, start, end, course,
-        active=False):
+    def __init__(self, kind, instructor, days, start, end, course):
         """Initializes the Meeting. The parameters are:
             kind : a string like 'LEC' or 'DIS'.
             instructor : a string, the name of the instructor.
             days : a string like 'MWF'.
             start : a WeekTime object holding the start time.
             end : a WeekTime object holding the end time.
-            active : a boolean value indicating whether the MeetingGroup has
-                been selected to be enrolled in.
             course : the course to which this MeetingGroup belongs.
         Though it does not, strictly speaking, matter, the start and end
         WeekTimes should have day values of None, for good practice."""
@@ -127,8 +104,12 @@ class MeetingGroup(object):
         self.kind = kind
         self.instructor = instructor
 
+        self.days = days
+        self.start = start
+        self.end = end
+
         self.meetings = []
-        for d in days:
+        for d in self.days:
             try:
                 d_idx = self.allowed_days.find(d) + 1
             except ValueError:
@@ -136,7 +117,11 @@ class MeetingGroup(object):
             m_start = wt.WeekTime(d_idx, start.hour, start.minute)
             m_end = wt.WeekTime(d_idx, end.hour, end.minute)
             self.meetings.append(Meeting(m_start, m_end, self))
-        self.active = active
+
+    def dropdown_format(self):
+        """Returns a string useful for display in web dropdown menus."""
+        return (self.days + ' ' + self.start.as_tod_string() + ' - '
+            + self.end.as_tod_string())
 
 class Meeting(object):
     """A Meeting refers to a single event during the week."""

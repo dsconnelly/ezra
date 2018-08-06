@@ -15,8 +15,18 @@ def course_lookup():
 
     q = apiquery.Query()
     c = q.get_course_by_dept_and_number(dept_short, number)
-    return flask.json.dumps({'dept_short' : c.dept_short, 'number' : c.number,
-        'title' : c.title})
+
+    meeting_group_data = {kind : [] for kind in c.required}
+    for mg in c.meeting_groups:
+        meeting_group_data[mg.kind].append(mg.dropdown_format())
+
+    return flask.jsonify({
+        'dept_short' : c.dept_short,
+        'number' : c.number,
+        'title' : c.title,
+        'required' : c.required,
+        'meeting_group_data' : meeting_group_data
+    })
 
 if __name__ == '__main__':
    app.run(debug = True)
