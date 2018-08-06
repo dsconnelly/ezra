@@ -1,0 +1,17 @@
+================================================================================
+19 July 2018
+================================================================================
+In this file we will attempt to lay out and track progress of various goals in
+the development of EZRA. The project is in its initial phases, so the goals we
+describe in this entry will be fundamental and relatively basic.
+    1. Design classes capable of storing course information in a sensible way,
+        including information like times, credits, and professors.
+    2. Design any necessary time classes pertinent to the completion of (1).
+    3. Write code to query the Scheduler API and return results in the form of
+        the data structure created in (1).
+    4. Design a data structure capable of describing an entire schedule, and
+        endow it with the functionality to determine its own consistency.
+    5. Accomplish (1-4) in a manner such that the results are conducive to
+        easy display, as later we will have to design a GUI.
+================================================================================
+================================================================================

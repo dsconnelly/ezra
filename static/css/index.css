@@ -1,0 +1,34 @@
+body {
+    background-color: #F7F7F7;
+    font-family: "Courier New";
+}
+
+h1 {
+    color: #B31B1B;
+}
+
+p {
+    color: black;
+}
+
+table {
+    border-collapse: collapse;
+    text-align: center;
+    width: 100%;
+}
+
+table, th, td {
+   border: 1px solid black;
+}
+
+.hhblock {
+    height: 28px;
+}
+
+.classInfoCell {
+    width: 250px;
+}
+
+.dayHeaderCell {
+    width: 200px;
+}
