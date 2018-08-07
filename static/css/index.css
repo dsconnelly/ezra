@@ -26,21 +26,43 @@ table {
     float: right;
 }
 
-table, th, td {
+table, th {
    border: 1px solid black;
 }
 
-.hhblock {
-    height: 28px;
+td {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
 }
 
-.classInfoCell {
+.fiveMinute, .fiveMinuteTop, .fiveMinuteBot {
+    height: 4px;
+}
+
+.fiveMinute{
+    border-top:: 0px;
+    border-bottom: 0px;
+}
+
+.fiveMinuteTop{
+    border-top:: 1px solid black;
+    border-bottom: 0px;
+}
+
+.fiveMinuteBot{
+    border-top:: 0px;
+    border-bottom: 1px solid black;
+}
+
+.classInfoCell, .classInfoCellFixed {
     width: 250px;
     height: 75px;
+    border: 1px solid black;
 }
 
 .timeCell {
     width: 75px;
+    border: 1px solid black;
 }
 
 .dayHeaderCell {
@@ -54,6 +76,14 @@ a {
 
 select, button {
     margin: 3px;
+    font-family: inherit;
+}
+
+select {
     background-color: inherit;
-    font-family: inherit; 
+}
+
+button {
+    color: #F7F7F7;
+    background-color: #B31B1B;
 }

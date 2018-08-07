@@ -13,12 +13,13 @@ function class_info_cell_add(data) {
 
     to_add = (dept_short + " " + number + ": " + title).toLowerCase() + "<br>";
     for (i = 0; i < required.length; i++) {
-        to_add += "<select>";
+        var sel_id = dept_short + number + required[i];
+        to_add += "<select id=\"" + sel_id + "\" class=\"meetingGroup\">";
         to_add += "<option value=\"\" disabled selected>select " + required[i] + "</option>";
 
         var available_groups = meeting_group_data[required[i]];
         for (j = 0; j < available_groups.length; j++) {
-            to_add += "<option value=\"\">" + available_groups[j] + "</option>";
+            to_add += "<option value=\"" + available_groups[j] + "\">" + available_groups[j] + "</option>";
         }
 
         to_add += "</select><br/>";
@@ -28,6 +29,10 @@ function class_info_cell_add(data) {
 
     $(this).html(to_add);
     turn_off_info_cell($(this));
+
+    $(".meetingGroup").change(function() {
+        add_block_to_schedule($(this))
+    })
 }
 
 function turn_off_info_cell(cell) {
@@ -45,6 +50,14 @@ function turn_off_info_cell(cell) {
 function turn_on_info_cell(cell) {
     cell.removeClass("classInfoCellFixed");
     cell.addClass("classInfoCell");
+
+    cell.find("select").each(function() {
+        var sel_id = $(this).attr("id");
+        $("." + sel_id).each(function() {
+            $(this).css("background-color", "#F7F7F7");
+            $(this).removeClass(sel_id);
+        })
+    });
 
     cell.attr("contenteditable", "true");
     cell.html("click to add a class");
@@ -81,4 +94,52 @@ function turn_on_info_cell(cell) {
             });
         }
     });
+}
+
+function add_block_to_schedule(select) {
+    var sel_id = select.attr("id");
+    $("." + sel_id).each(function() {
+        $(this).css("background-color", "#F7F7F7");
+        $(this).removeClass(sel_id);
+    })
+
+    var opt_parts = select.val().split(" ");
+    var days = opt_parts[0];
+    var start = opt_parts[1];
+    var end = opt_parts[3];
+
+    var start_split = start.split(":");
+    var start_h = Number(start_split[0]);
+    var start_m = Number(start_split[1]);
+
+    var end_split = end.split(":");
+    var end_h = Number(end_split[0]);
+    var end_m = Number(end_split[1]);
+
+    var start_h_row = 1 + ((start_h - 8) * 12);
+    var start_m_row = start_m / 5;
+    var start_row = start_h_row + start_m_row;
+
+    var end_h_row = 1 + ((end_h - 8) * 12);
+    var end_m_row = end_m / 5;
+    var end_row = end_h_row + end_m_row;
+
+    var table = $("#scheduleTable");
+
+    for (i = 0; i < days.length; i++) {
+        var d = days.charAt(i);
+        var d_idx = "MTWRF".indexOf(d) + 1;
+
+        for (j = start_row; j < end_row; j++) {
+            var col = d_idx
+            if (!((j - 1) % 12 == 0)) {
+                col = col - 1;
+            }
+
+            cell = $("#scheduleTable tr").eq(j).find('td').eq(col);
+            cell.css("background-color", "#B31B1B");
+            cell.addClass(sel_id);
+
+        }
+    }
 }
