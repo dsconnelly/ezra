@@ -27,17 +27,25 @@ class Course(object):
         self._dept_short = dept_short
 
         if type(number) is not int:
-            raise ValueError('Course number must be an int; got '
-                + str(number))
-        self._number = number
+            try:
+                self._number = int(number)
+            except ValueError:
+                raise ValueError('Course number must be an int; got '
+                    + str(number))
+        else:
+            self._number = number
 
         if type(title) is not str:
             raise ValueError('Course title must be a string; got ' + str(title))
         self._title = title
 
         if type(required) is not set:
-            raise ValueError('Course requirements must be a set')
-        self._required = list(required)
+            if sorted(list(required)) == sorted(list(set(required))):
+                self._required = list(required)
+            else:
+                raise ValueError('Course requirements must be a set')
+        else:
+            self._required = list(required)
 
         self._meeting_groups = meeting_groups
         for mg in self.meeting_groups:
@@ -84,7 +92,7 @@ class MeetingGroup(object):
     allowed_kinds = ['LEC', 'DIS', 'LAB', 'TA', 'SEM', 'STU']
     allowed_days = ['M', 'T', 'W', 'R', 'F', 'S', 'Su']
 
-    def __init__(self, kind, instructor, days, start, end, course):
+    def __init__(self, kind, instructor, days, start, end, course=None):
         """Initializes the Meeting. The parameters are:
             kind : a string like 'LEC' or 'DIS'.
             instructor : a string, the name of the instructor.
@@ -104,7 +112,7 @@ class MeetingGroup(object):
         self.kind = kind
         self.instructor = instructor
 
-        self.days = days
+        self.days = self.parse_day_string(days)
         self.start = start
         self.end = end
 
@@ -117,11 +125,24 @@ class MeetingGroup(object):
             m_start = wt.WeekTime(d_idx, start.hour, start.minute)
             m_end = wt.WeekTime(d_idx, end.hour, end.minute)
             self.meetings.append(Meeting(m_start, m_end, self))
+        self.course = course
 
     def dropdown_format(self):
         """Returns a string useful for display in web dropdown menus."""
         return (''.join(self.days) + ' ' + self.start.as_tod_string() + ' - '
             + self.end.as_tod_string())
+
+    @staticmethod
+    def parse_day_string(s):
+        """Given a string like 'MWF', returns an array of the day codes. Needed
+        because the Sunday code is 'Su'."""
+        output = []
+        for c in s:
+            if c == 'u':
+                output[-1] += 'u'
+            else:
+                output.append(c)
+        return output
 
 class Meeting(object):
     """A Meeting refers to a single event during the week."""
