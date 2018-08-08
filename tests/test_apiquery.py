@@ -1,22 +1,18 @@
 """Tests for the apiquery module."""
-import unittest
+import pytest
 import apicode.apiquery as aq
 
-class QueryTest(unittest.TestCase):
-    """Tests for the Query class."""
-    def test_init(self):
-        q = aq.Query()
-        self.assertEqual('Mathematics', q.department_keys['MATH'])
-        self.assertEqual('English', q.department_keys['ENGL'])
+# Tests for the Query class.
+def test_init():
+    q = aq.Query()
+    assert 'Mathematics' == q.department_keys['MATH']
+    assert 'English' == q.department_keys['ENGL']
 
-    def test_get_course_by_dept_and_number(self):
-        q = aq.Query()
-        c = q.get_course_by_dept_and_number('EAS', 3050)
+def test_get_course_by_dept_and_number():
+    q = aq.Query()
+    c = q.get_course_by_dept_and_number('EAS', 3050)
 
-        self.assertEqual('Climate Dynamics', c.title)
-        self.assertEqual(['LEC'], c.required)
-        self.assertEqual(1, len(c.meeting_groups))
-        self.assertEqual(3, len(c.meeting_groups[0].meetings))
-
-if __name__ == '__main__':
-    unittest.main()
+    assert 'Climate Dynamics' == c.title
+    assert ['LEC'] == c.required
+    assert 1 == len(c.meeting_groups)
+    assert 3 == len(c.meeting_groups[0].meetings)
