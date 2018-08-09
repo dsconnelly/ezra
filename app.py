@@ -11,10 +11,8 @@ def index():
 def course_lookup():
     data = flask.request.get_json()
 
-    dept_short, number = data['search'].split()
-
     q = query.Query()
-    c = q.get_course_by_dept_and_number(dept_short, number)
+    c = q.parse_search(data['search'])
 
     return flask.jsonify(c.as_json())
 

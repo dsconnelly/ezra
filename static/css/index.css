@@ -35,15 +35,7 @@ a {
 select, button {
     margin: 3px;
     font-family: inherit;
-}
-
-select {
-    background-color: inherit;
-}
-
-button {
-    color: #F7F7F7;
-    background-color: #B31B1B;
+    background-color : #F7F7F7
 }
 
 /* styles for the schedule and information tables */
@@ -96,4 +88,31 @@ button {
     width: 250px;
     height: 75px;
     border: 1px solid black;
+    color : #F7F7F7;
+}
+
+/* styles for the courseInput cells */
+
+#courseInput1 {
+    background-color : #B31B1B; /* carnellian */
+}
+
+#courseInput2 {
+    background-color : #073949; /* navy */
+}
+
+#courseInput3 {
+    background-color : #6EB43F; /* green */
+}
+
+#courseInput4 {
+    background-color : #F8981D; /* orange */
+}
+
+#courseInput5 {
+    background-color : #006699; /* blue */
+}
+
+#courseInput6 {
+    background-color : #A2998B; /* red */
 }

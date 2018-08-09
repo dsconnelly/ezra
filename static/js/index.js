@@ -153,9 +153,11 @@ function display_section(select) {
     // Get the table containing the schedule display.
     var table = $("#scheduleTable");
 
-    // Now, we color in all the five-minute cells in the appropriate ranges on
+    // Now, we find all the five-minute cells in the appropriate ranges on
     // each day. We have to make adjustments for times exactly on the hour
-    // because of the way rowspan works.
+    // because of the way rowspan works. However, we do not actually do the
+    // coloring yet; rather, we add a class that we will use later, because
+    // we will first need to make sure it does not conflict.
     for (i = 0; i < day_idxs.length; i++) {
         for (row = start_row; row < end_row; row++) {
             // Get the column to use, checking for the rowspan issue.
@@ -163,8 +165,31 @@ function display_section(select) {
 
             // Get the table cell and color it.
             cell = $("#scheduleTable tr").eq(row).find("td").eq(col);
-            cell.css("background-color", "#B31B1B");
             cell.addClass(s_id);
         }
+    }
+
+    // We check all the cells we just found. If any are already part of another
+    // section, we set a flag.
+    var conflict = false;
+    $("." + s_id).each(function() {
+        if ($(this).prop("classList").length > 2) {
+            conflict = true;
+        }
+    });
+
+    // If there is a conflict, we (for now) raise an alert about it and remove
+    // the added class. Otherwise, we get the appropriate color and use it to
+    // color in the cells we've found.
+    if (conflict) {
+        $("." + s_id).each(function() {
+            $(this).removeClass(s_id);
+        });
+        alert("Cannot add this section due to a conflict");
+    } else {
+        var fill_color = select.parent().css("background-color");
+        $("." + s_id).each(function() {
+            $(this).css("background-color", fill_color);
+        });
     }
 }
