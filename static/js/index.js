@@ -1,145 +1,170 @@
 $( document ).ready(function() {
-    $(".classInfoCell").each(function() {
-        turn_on_info_cell($(this));
+    $(".courseInputCell").each(function() {
+        turn_on_input_cell($(this));
     });
 });
 
-function class_info_cell_add(data) {
-    var dept_short = data['dept_short'];
-    var number = data['number'];
-    var title = data['title'];
-    var required = data['required']
-    var meeting_group_data = data['meeting_group_data']
+function turn_on_input_cell(cell) {
+    // There are two classes these cells may have. They all begin with class
+    // courseInputCell. In this state they may be used for inputting searches.
+    // Alternatively, they may have class courseInfoCell. In this state a course
+    // has already been selected, and section information is being displayed.
+    cell.removeClass('courseInfoCell');
+    cell.addClass('courseInputCell');
 
-    to_add = (dept_short + " " + number + ": " + title).toLowerCase() + "<br>";
-    for (i = 0; i < required.length; i++) {
-        var sel_id = dept_short + number + required[i];
-        to_add += "<select id=\"" + sel_id + "\" class=\"meetingGroup\">";
-        to_add += "<option value=\"\" disabled selected>select " + required[i] + "</option>";
-
-        var available_groups = meeting_group_data[required[i]];
-        for (j = 0; j < available_groups.length; j++) {
-            to_add += "<option value=\"" + available_groups[j] + "\">" + available_groups[j] + "</option>";
-        }
-
-        to_add += "</select><br/>";
-    }
-
-    to_add += "<button class=\"classInfoReset\">clear</button>";
-
-    $(this).html(to_add);
-    turn_off_info_cell($(this));
-
-    $(".meetingGroup").change(function() {
-        add_block_to_schedule($(this))
-    })
-}
-
-function turn_off_info_cell(cell) {
-    cell.removeClass("classInfoCell");
-    cell.addClass("classInfoCellFixed");
-
-    cell.attr("contenteditable", "false");
-    cell.off();
-
-    $(".classInfoReset").click(function() {
-        turn_on_info_cell($(this).parent());
-    })
-}
-
-function turn_on_info_cell(cell) {
-    cell.removeClass("classInfoCellFixed");
-    cell.addClass("classInfoCell");
-
+    // Now we check if there was a course in this cell before, and if there was,
+    // we unshade all the calendar boxes that might have been  there.
     cell.find("select").each(function() {
-        var sel_id = $(this).attr("id");
-        $("." + sel_id).each(function() {
+        var s_id = $(this).attr("id");
+        $("." + s_id).each(function() {
             $(this).css("background-color", "#F7F7F7");
-            $(this).removeClass(sel_id);
-        })
+            $(this).removeClass(s_id);
+        });
     });
 
     cell.attr("contenteditable", "true");
     cell.html("click to add a class");
 
+    // We set text in the cell to disappear when the cell is clicked. But we use
+    // mousedown instead of click, since click sets the focus and then our check
+    // for focus would always be vacuously true. We need to check for focus so
+    // that the text only is deleted if the user wasn't previously typing in
+    // this cell.
     cell.mousedown(function() {
         if (!(cell.is(":focus"))) {
             cell.html("");
         }
     });
 
+    // Now we wait for Enter to be pushed in the cell, which triggers the call
+    // to the server via AJAX.
     cell.keypress(function(e) {
         if (e.which == 13) {
             e.preventDefault();
             cell.blur();
 
-            var user_query = cell.html().split(" ");
-            var dept_short = user_query[0];
-            var number = user_query[1];
-
+            // We make the call to the server. Eventually, we will have code
+            // there  to catch the request and figure out exactly what form
+            // the request is in. For this reason, we just send the whole
+            // entry and let the server parse it.
             $.ajax({
                 url : "/search",
                 type : "POST",
                 data : JSON.stringify({
-                    "dept_short" : dept_short,
-                    "number" : number
+                    "search" : cell.html()
                 }),
                 dataType : "json",
                 contentType: "application/json",
                 context: cell,
-                success : class_info_cell_add,
+                success : receive_server_response,
                 error : function() {
-                    cell.html("class not found");
+                    cell.html("server error");
                 }
             });
         }
     });
 }
 
-function add_block_to_schedule(select) {
-    var sel_id = select.attr("id");
-    $("." + sel_id).each(function() {
+function turn_off_input_cell(cell) {
+    cell.removeClass('courseInputCell');
+    cell.addClass('courseInfoCell');
+
+    // Remove the capability to edit the cell, and remove the previously defined
+    // behavior triggered by clicks.
+    cell.attr("contenteditable", "false");
+    cell.off();
+
+    // Set the dropdown menus in this class to have the appropriate behavior.
+    cell.find(".sectionSelect").change(function() {
+        display_section($(this));
+    });
+
+    // Set the reset button to the appropriate function.
+    cell.find(".courseClear").click(function() {
+        turn_on_input_cell($(this).parent());
+    });
+}
+
+function receive_server_response(data) {
+    // We unpack some of the data for convenience later.
+    var dept_short = data["dept_short"];
+    var number = data["number"];
+    var title = data["title"];
+    var required = data["required"];
+    var sections = data["sections"];
+
+    // We store the data in sessionStorage. Potentially will use localStorage,
+    // but for debugging sessionStorage makes more sense as we will want a clean
+    // state each time we refresh.
+    var c_id = dept_short + number; // course id
+    sessionStorage.setItem(c_id, JSON.stringify(data));
+
+    // We begin setting up the text to add to the cell.
+    var to_add = ((dept_short + " " + number + ": "
+        + title).toLowerCase() + "</br>");
+
+    // For each category of required section, we add a dropdown menu.
+    for (i = 0; i < required.length; i++) {
+        s_id = c_id + "_" + required[i]; // select id
+        to_add += "<select id=\"" + s_id + "\" class=\"sectionSelect\">";
+        to_add += ("<option value=\"\" disabled selected>select "
+            + required[i] + "</option>");
+
+        for (j = 0; j < sections.length; j++) {
+            // We look through all the available sections. If they are of the
+            // right kind, we add an option to the dropdown and set its value
+            // to be its index in the list of sections.
+            if (sections[j]['kind'] == required[i]) {
+                to_add += ("<option value=\"" + j.toString() + "\">"
+                    + sections[j]['ref'] + "</option>");
+            }
+        }
+        to_add += "</select></br>";
+    }
+
+    // We add the clear button.
+    to_add += "<button class=\"courseClear\">clear</button>";
+
+    // Finally, we set the cell HTML to the string we've created and call the
+    // function to turn off input for this cell.
+    $(this).html(to_add);
+    turn_off_input_cell($(this));
+}
+
+function display_section(select) {
+    // Get the id of the particular dropdown menu.
+    var s_id = select.attr("id");
+
+    // If any gridboxes were already filled in from this section, clear them.
+    $("." + s_id).each(function() {
         $(this).css("background-color", "#F7F7F7");
-        $(this).removeClass(sel_id);
-    })
+        $(this).removeClass(s_id);
+    });
 
-    var opt_parts = select.val().split(" ");
-    var days = opt_parts[0];
-    var start = opt_parts[1];
-    var end = opt_parts[3];
+    // Retrieve the section information from storage.
+    var key = s_id.split("_")[0];
+    var j = Number(select.val());
+    var section = JSON.parse(sessionStorage.getItem(key))["sections"][j];
 
-    var start_split = start.split(":");
-    var start_h = Number(start_split[0]);
-    var start_m = Number(start_split[1]);
+    var day_idxs = section["day_idxs"];
+    var start_row = section["start_row"];
+    var end_row = section["end_row"];
 
-    var end_split = end.split(":");
-    var end_h = Number(end_split[0]);
-    var end_m = Number(end_split[1]);
-
-    var start_h_row = 1 + ((start_h - 8) * 12);
-    var start_m_row = start_m / 5;
-    var start_row = start_h_row + start_m_row;
-
-    var end_h_row = 1 + ((end_h - 8) * 12);
-    var end_m_row = end_m / 5;
-    var end_row = end_h_row + end_m_row;
-
+    // Get the table containing the schedule display.
     var table = $("#scheduleTable");
 
-    for (i = 0; i < days.length; i++) {
-        var d = days.charAt(i);
-        var d_idx = "MTWRF".indexOf(d) + 1;
+    // Now, we color in all the five-minute cells in the appropriate ranges on
+    // each day. We have to make adjustments for times exactly on the hour
+    // because of the way rowspan works.
+    for (i = 0; i < day_idxs.length; i++) {
+        for (row = start_row; row < end_row; row++) {
+            // Get the column to use, checking for the rowspan issue.
+            var col = ((row - 1) % 12 == 0) ? day_idxs[i] : day_idxs[i] - 1;
 
-        for (j = start_row; j < end_row; j++) {
-            var col = d_idx
-            if (!((j - 1) % 12 == 0)) {
-                col = col - 1;
-            }
-
-            cell = $("#scheduleTable tr").eq(j).find('td').eq(col);
+            // Get the table cell and color it.
+            cell = $("#scheduleTable tr").eq(row).find("td").eq(col);
             cell.css("background-color", "#B31B1B");
-            cell.addClass(sel_id);
-
+            cell.addClass(s_id);
         }
     }
 }

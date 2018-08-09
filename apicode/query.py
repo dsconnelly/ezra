@@ -50,13 +50,13 @@ class Query(object):
 
         sections = []
         for eg in json['enrollGroups']:
-            for cs in e['classSections']:
+            for cs in eg['classSections']:
                 kind = cs['ssrComponent']
 
                 for sec in cs['meetings']:
                     instructor = []
                     for i in sec['instructors']:
-                        instructor.append(i['firstName'] + i['lastName'])
+                        instructor.append(i['firstName'] + ' ' + i['lastName'])
                     instructor = ', '.join(instructor)
 
                     days = sec['pattern']

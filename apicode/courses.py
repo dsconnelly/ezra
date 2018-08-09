@@ -15,6 +15,7 @@ class Course(object):
             title : a string, like 'Analysis I'.
             required : a list of strings like 'LEC' and 'DIS'. Elements are
                 required to be unique.
+            sections : a list of Section objects.
         We also perform the appropriate checks on arguments to ensure they are
         what they are supposed to be."""
         if type(department) is not str:

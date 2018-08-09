@@ -1,5 +1,5 @@
 import flask
-import apicode.apiquery as apiquery
+import apicode.query as query
 
 app = flask.Flask(__name__)
 
@@ -10,23 +10,13 @@ def index():
 @app.route('/search', methods=['POST'])
 def course_lookup():
     data = flask.request.get_json()
-    dept_short = data['dept_short']
-    number  = int(data['number'])
 
-    q = apiquery.Query()
+    dept_short, number = data['search'].split()
+
+    q = query.Query()
     c = q.get_course_by_dept_and_number(dept_short, number)
 
-    meeting_group_data = {kind : [] for kind in c.required}
-    for mg in c.meeting_groups:
-        meeting_group_data[mg.kind].append(mg.dropdown_format())
-
-    return flask.jsonify({
-        'dept_short' : c.dept_short,
-        'number' : c.number,
-        'title' : c.title,
-        'required' : c.required,
-        'meeting_group_data' : meeting_group_data
-    })
+    return flask.jsonify(c.as_json())
 
 if __name__ == '__main__':
    app.run(debug = True)

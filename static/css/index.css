@@ -1,3 +1,5 @@
+/* general body and basic text styles */
+
 body {
     background-color: #F7F7F7;
     font-family: "Courier New";
@@ -16,16 +18,6 @@ table {
     text-align: center;
 }
 
-#scheduleTable {
-    width: 75%;
-    float: left;
-}
-
-#classInfoTable {
-    width: 23%;
-    float: right;
-}
-
 table, th {
    border: 1px solid black;
 }
@@ -34,6 +26,50 @@ td {
     border-left: 1px solid black;
     border-right: 1px solid black;
 }
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+select, button {
+    margin: 3px;
+    font-family: inherit;
+}
+
+select {
+    background-color: inherit;
+}
+
+button {
+    color: #F7F7F7;
+    background-color: #B31B1B;
+}
+
+/* styles for the schedule and information tables */
+
+#scheduleTable {
+    width: 75%;
+    float: left;
+}
+
+#courseInfoTable {
+    width: 23%;
+    float: right;
+}
+
+/* styles for row and column headers in the schedule table */
+
+.timeCell {
+    width: 75px;
+    border: 1px solid black;
+}
+
+.dayHeaderCell {
+    width: 200px;
+}
+
+/* styles to hide the appropriate cells in the schedule table */
 
 .fiveMinute, .fiveMinuteTop, .fiveMinuteBot {
     height: 4px;
@@ -54,36 +90,10 @@ td {
     border-bottom: 1px solid black;
 }
 
-.classInfoCell, .classInfoCellFixed {
+/* styles for the cells in the information table */
+
+.courseInputCell, .courseInfoCell {
     width: 250px;
     height: 75px;
     border: 1px solid black;
-}
-
-.timeCell {
-    width: 75px;
-    border: 1px solid black;
-}
-
-.dayHeaderCell {
-    width: 200px;
-}
-
-a {
-  color: inherit;
-  text-decoration: inherit;
-}
-
-select, button {
-    margin: 3px;
-    font-family: inherit;
-}
-
-select {
-    background-color: inherit;
-}
-
-button {
-    color: #F7F7F7;
-    background-color: #B31B1B;
 }
