@@ -8,77 +8,80 @@
     </head>
 
     <body>
-        <h1>welcome to <a href="https://en.wikipedia.org/wiki/Ezra_Cornell">ezra</a>, the ez roster assistant.</h1>
+        <h1>
+            welcome to <a href="https://en.wikipedia.org/wiki/Ezra_Cornell"
+            target="_blank">ezra</a>, the ez roster assistant.
+        </h1>
         <p>
-            ezra is a scheduling app that knows about degree requirements. get
-            started by adding some courses on the right.
+            ezra is a scheduling app that knows about degree requirements.
+            get started by adding some courses on the right.
         </p>
 
-        <table align="center" id="scheduleTable">
-            <tr>
-                <th></th>
-                <th class="dayHeaderCell">monday</th>
-                <th class="dayHeaderCell">tuesday</th>
-                <th class="dayHeaderCell">wednesday</th>
-                <th class="dayHeaderCell">thursday</th>
-                <th class="dayHeaderCell">friday</th>
-            </tr>
+        <div id="scheduleDiv">
+            <table id="scheduleTable">
+                <tr>
+                    <th></th>
+                    <th class="dayHeaderCell">monday</th>
+                    <th class="dayHeaderCell">tuesday</th>
+                    <th class="dayHeaderCell">wednesday</th>
+                    <th class="dayHeaderCell">thursday</th>
+                    <th class="dayHeaderCell">friday</th>
+                </tr>
 
-            {% for i in range(8, 17) %}
-            <tr>
-                <td rowspan="12" class="timeCell">{{i|string + ':00'}}</td>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-            </tr>
+                {% for i in range(8, 21) %}
 
-            {% for j in range(1, 12) %}
+                {% if i > 12 %}
+                {% set h = i - 12 %}
+                {% else %}
+                {% set h = i %}
+                {% endif %}
 
-            {% if j == 5 or j == 11 %}
-            <tr>
-                <td class="fiveMinuteBot"></td>
-                <td class="fiveMinuteBot"></td>
-                <td class="fiveMinuteBot"></td>
-                <td class="fiveMinuteBot"></td>
-                <td class="fiveMinuteBot"></td>
-            </tr>
-            {% elif j == 6 %}
-            <tr>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-                <td class="fiveMinuteTop"></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td class="fiveMinute"></td>
-                <td class="fiveMinute"></td>
-                <td class="fiveMinute"></td>
-                <td class="fiveMinute"></td>
-                <td class="fiveMinute"></td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
+                {% if i % 2 == 0 %}
+                {% set c = 'grayHour' %}
+                {% else %}
+                {% set c = 'whiteHour' %}
+                {% endif %}
 
-        </table>
+                {% for j in range(12) %}
 
-        <table id="courseInfoTable">
-            <tr>
-                <th>class info</th>
-            </tr>
+                    <tr>
+                        {% if j == 0 %}
+                            <td rowspan="12" class="timeCell {{ c }}">{{h|string + ':00'}}</td>
+                        {% endif %}
 
-            {% for i in range(0, 6) %}
-            <tr>
-                <td id="courseInput{{ i + 1 }}" class="courseInputCell">
-                    click to add a class
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+                        {% for k in range(5) %}
+                            <td class="fiveMinute {{ c }}"></td>
+                        {% endfor %}
 
+                    </tr>
+
+                {% endfor %}
+                {% endfor %}
+
+            </table>
+        </div>
+
+        <div id="courseInfoDiv">
+            <table id="courseInfoTable">
+                <tr>
+                    <th>class info</th>
+                </tr>
+
+                {% for i in range(0, 6) %}
+                <tr>
+                    <td id="courseInput{{ i + 1 }}" class="courseInputCell">
+                        click to add a class
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div id="footer">
+            <p>
+                found a bug? report it <b><a class="footerLink" target="_blank"
+                href="https://github.com/dsconnelly/ezra/issues">here</a></b>!
+            </p>
+        </div>
     </body>
 </html>

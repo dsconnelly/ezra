@@ -15,11 +15,7 @@ function turn_on_input_cell(cell) {
     // Now we check if there was a course in this cell before, and if there was,
     // we unshade all the calendar boxes that might have been  there.
     cell.find("select").each(function() {
-        var s_id = $(this).attr("id");
-        $("." + s_id).each(function() {
-            $(this).css("background-color", "#F7F7F7");
-            $(this).removeClass(s_id);
-        });
+        clear_selection($(this));
     });
 
     cell.attr("contenteditable", "true");
@@ -85,6 +81,15 @@ function turn_off_input_cell(cell) {
     });
 }
 
+function clear_selection(select) {
+    var s_id = select.attr("id");
+    $("." + s_id).each(function() {
+        $(this).css("background-color", "");
+        $(this).html("");
+        $(this).removeClass(s_id);
+    });
+}
+
 function receive_server_response(data) {
     // We unpack some of the data for convenience later.
     var dept_short = data["dept_short"];
@@ -136,15 +141,13 @@ function display_section(select) {
     var s_id = select.attr("id");
 
     // If any gridboxes were already filled in from this section, clear them.
-    $("." + s_id).each(function() {
-        $(this).css("background-color", "#F7F7F7");
-        $(this).removeClass(s_id);
-    });
+    clear_selection(select);
 
     // Retrieve the section information from storage.
     var key = s_id.split("_")[0];
     var j = Number(select.val());
-    var section = JSON.parse(sessionStorage.getItem(key))["sections"][j];
+    var data = JSON.parse(sessionStorage.getItem(key));
+    var section = data["sections"][j];
 
     var day_idxs = section["day_idxs"];
     var start_row = section["start_row"];
@@ -163,7 +166,7 @@ function display_section(select) {
             // Get the column to use, checking for the rowspan issue.
             var col = ((row - 1) % 12 == 0) ? day_idxs[i] : day_idxs[i] - 1;
 
-            // Get the table cell and color it.
+            // Get the table cell and label it.
             cell = $("#scheduleTable tr").eq(row).find("td").eq(col);
             cell.addClass(s_id);
         }
@@ -173,7 +176,7 @@ function display_section(select) {
     // section, we set a flag.
     var conflict = false;
     $("." + s_id).each(function() {
-        if ($(this).prop("classList").length > 2) {
+        if ($(this).prop("classList").length > 3) {
             conflict = true;
         }
     });
@@ -190,6 +193,24 @@ function display_section(select) {
         var fill_color = select.parent().css("background-color");
         $("." + s_id).each(function() {
             $(this).css("background-color", fill_color);
+        });
+
+        // We also print the section id in the table.
+        var to_write = (data["dept_short"].toLowerCase() + " " + data["number"]
+            + " " + s_id.split("_")[1]);
+
+        for (i = 0; i < day_idxs.length; i++) {
+            row = start_row;
+            col = ((row - 1) % 12 == 0) ? day_idxs[i] : day_idxs[i] - 1;
+            cell = $("#scheduleTable tr").eq(row).find("td").eq(col);
+            cell.html("<div class=\"boxLabel\"><p>" + to_write + "</p></div>");
+        }
+
+        // We ensure that the text is centered in each cell.
+        $(".boxLabel > p").each(function() {
+            var cwidth = $(this).parent().parent().outerWidth();
+            var pwidth = $(this).outerWidth();
+            $(this).css("left", (cwidth - pwidth) / 2);
         });
     }
 }

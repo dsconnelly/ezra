@@ -3,6 +3,7 @@
 body {
     background-color: #F7F7F7;
     font-family: "Courier New";
+    position: relative;
 }
 
 h1 {
@@ -16,6 +17,7 @@ p {
 table {
     border-collapse: collapse;
     text-align: center;
+    table-layout: fixed;
 }
 
 table, th {
@@ -38,48 +40,85 @@ select, button {
     background-color : #F7F7F7
 }
 
+/* styles for the header and footer */
+
+#footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.footerLink {
+    color : #B31B1B;
+}
+
 /* styles for the schedule and information tables */
 
 #scheduleTable {
+    width: 100%;
+}
+
+#scheduleDiv {
     width: 75%;
+    height: 500px;
+    overflow-y: scroll;
     float: left;
 }
 
 #courseInfoTable {
-    width: 23%;
+    width: 100%;
+}
+
+#courseInfoDiv {
+    overflow-y: auto;
     float: right;
+    width: 23%;
+    height: 500px;
 }
 
 /* styles for row and column headers in the schedule table */
 
 .timeCell {
-    width: 75px;
-    border: 1px solid black;
+    width: 10%;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-top: 0;
+    border-bottom: 0;
 }
 
 .dayHeaderCell {
-    width: 200px;
+    width: 18%;
 }
 
-/* styles to hide the appropriate cells in the schedule table */
-
-.fiveMinute, .fiveMinuteTop, .fiveMinuteBot {
-    height: 4px;
-}
+/* styles for cells in the schedule table */
 
 .fiveMinute{
-    border-top: 0px;
-    border-bottom: 0px;
+    color : #F7F7F7;
+    height: 4px;
+    border: 0;
+    padding: 0px;
 }
 
-.fiveMinuteTop{
-    border-top:: 1px solid black;
-    border-bottom: 0px;
+.grayHour {
+    background-color: #D3D3D3;
 }
 
-.fiveMinuteBot{
-    border-top:: 0px;
-    border-bottom: 1px solid black;
+.whiteHour {
+    background-color: #F7F7F7;
+}
+
+.boxLabel {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.boxLabel > p {
+    position: absolute;
+    color: #F7F7F7;
+    top: 0;
 }
 
 /* styles for the cells in the information table */
@@ -102,7 +141,7 @@ select, button {
 }
 
 #courseInput3 {
-    background-color : #6EB43F; /* green */
+    background-color : #629632; /* green */
 }
 
 #courseInput4 {
@@ -114,5 +153,5 @@ select, button {
 }
 
 #courseInput6 {
-    background-color : #A2998B; /* red */
+    background-color : #9370DB; /* purple */
 }
